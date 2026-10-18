@@ -90,4 +90,22 @@ auth.onAuthStateChanged(u=>{if(u){box.classList.add('hidden');if(!db){startApp()
 window.doLogin=async e=>{e.preventDefault();$('loginMsg').textContent='جاري الدخول...';try{await auth.signInWithEmailAndPassword($('loginEmail').value.trim(),$('loginPass').value)}catch(err){const c=(err&&err.code)||'';$('loginMsg').textContent=/invalid-credential|wrong-password|user-not-found|invalid-email/.test(c)?'البريد أو كلمة السر غير صحيحة':/unauthorized-domain/.test(c)?'هذا الرابط غير مضاف بقائمة Authorized domains بـ Firebase':/api-key/.test(c)?'مفتاح apiKey غير صحيح، راجع إعدادات الملف':/operation-not-allowed/.test(c)?'تسجيل الدخول بالبريد غير مفعّل بـ Firebase':/too-many-requests/.test(c)?'محاولات كثيرة، انتظر قليلاً ثم أعد المحاولة':/network/.test(c)?'لا يوجد اتصال بالإنترنت':'خطأ: '+c}};
 window.doLogout=()=>auth.signOut().then(()=>location.reload());
 })();
+/* عرض "الحساب كمل" عند تسديد كامل المبلغ */
+(function(){
+  const _rb=renderBookings;
+  renderBookings=function(){
+    _rb();
+    document.querySelectorAll('#bookingRows tr').forEach(tr=>{
+      const c=tr.children;
+      if(c.length<8)return;
+      const total=c[3].textContent.trim();
+      const left=c[5];
+      if(left.textContent.trim()==='0 د.ع'&&total!=='0 د.ع'){
+        left.className='greenText';
+        left.textContent='✅ الحساب كمل';
+      }
+    });
+  };
+  renderBookings();
+})();
 </script></body></html>
